@@ -2,6 +2,7 @@ import time
 
 from src.config.config import INPUT_XML_FOLDER, JSON_FOLDER, OUTPUT_FOLDER
 from src.utils.utils import clear_screen
+
 from src.app.xml_to_json import convert_xml_to_json
 from src.app.parsed_json import filters_target_json
 

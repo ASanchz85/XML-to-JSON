@@ -16,20 +16,19 @@ def extract_required_data(data):
             data["wpProQuiz"]["data"]["quiz"].get("questions", {}).get("question", [])
         )
 
+        # Check if 'questions' is a dictionary (single object), if so, wrap it in a list
+        if isinstance(questions, dict):
+            questions = [questions]
+
         # Filter the required fields from each question
         filtered_questions = []
         for question in questions:
+            # Ensure the fields are dictionaries before trying to call .get()
             filtered_question = {
-                "title": question.get(
-                    "title", {}
-                ),  # Get 'title' or empty string if missing
-                "points": question.get(
-                    "points", {}
-                ),  # Get 'points' or empty string if missing
-                "questionText": question.get(
-                    "questionText", {}
-                ),  # Get 'questionText' or empty string
-                "answers": question.get("answers", {}),  # Get 'answers' or empty array
+                "title": question.get("title", {}),
+                "points": question.get("points", {}),
+                "questionText": question.get("questionText", {}),
+                "answers": question.get("answers", {}),
             }
             filtered_questions.append(filtered_question)
 
@@ -37,7 +36,7 @@ def extract_required_data(data):
         extracted_data = {
             "quizModus": quiz_modus,
             "title": title,
-            "questions": filtered_questions,  # Include questions if they exist, otherwise leave empty
+            "questions": filtered_questions,
         }
 
         return extracted_data
