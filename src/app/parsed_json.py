@@ -45,42 +45,48 @@ def extract_required_data(data):
         return None
 
 
-def filters_target_json(input_folder, output_folder):
+def filters_target_json(
+    input_folder, output_folder, error_log_file="error_parsed_log.txt"
+):
     """Parses JSON files to the desired and filtered JSON format, while preserving folder structure."""
     file_counter = 0
 
-    for root_dir, subdirs, files in os.walk(input_folder):
-        # Calculate the relative path from the root directory
-        relative_path = os.path.relpath(root_dir, input_folder)
+    with open(error_log_file, "w") as log_file:
+        for root_dir, subdirs, files in os.walk(input_folder):
+            # Calculate the relative path from the root directory
+            relative_path = os.path.relpath(root_dir, input_folder)
 
-        # Create the corresponding folder in the output directory
-        output_subdir = os.path.join(output_folder, relative_path)
-        if not os.path.exists(output_subdir):
-            os.makedirs(output_subdir)
+            # Create the corresponding folder in the output directory
+            output_subdir = os.path.join(output_folder, relative_path)
+            if not os.path.exists(output_subdir):
+                os.makedirs(output_subdir)
 
-        for filename in files:
-            if filename.endswith(".json"):
-                file_counter += 1
-                input_file_path = os.path.join(root_dir, filename)
+            for filename in files:
+                if filename.endswith(".json"):
+                    file_counter += 1
+                    input_file_path = os.path.join(root_dir, filename)
 
-                # Read the input JSON file
-                with open(input_file_path, "r") as input_file:
-                    try:
-                        data = json.load(input_file)
+                    # Read the input JSON file
+                    with open(input_file_path, "r") as input_file:
+                        try:
+                            data = json.load(input_file)
 
-                        # Extract the required data
-                        extracted_data = extract_required_data(data)
+                            # Extract the required data
+                            extracted_data = extract_required_data(data)
 
-                        if extracted_data:
-                            # Write the extracted data to the output folder, preserving folder structure
-                            output_file_path = os.path.join(output_subdir, filename)
-                            with open(output_file_path, "w") as output_file:
-                                json.dump(extracted_data, output_file, indent=4)
-                            print(f"Processed {filename}")
-                        else:
-                            print(f"Skipped {filename} due to missing keys")
+                            if extracted_data:
+                                # Write the extracted data to the output folder, preserving folder structure
+                                output_file_path = os.path.join(output_subdir, filename)
+                                with open(output_file_path, "w") as output_file:
+                                    json.dump(extracted_data, output_file, indent=4)
+                                print(f"Processed {filename}")
+                            else:
+                                print(f"Skipped {filename} due to missing keys")
+                                log_file.write(
+                                    f"Skipped {filename} in path {input_file_path} due to missing keys\n"
+                                )
 
-                    except json.JSONDecodeError:
-                        print(f"Error decoding JSON in file: {filename}")
+                        except json.JSONDecodeError:
+                            print(f"Error decoding JSON in file: {filename}")
 
     return file_counter

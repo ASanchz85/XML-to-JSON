@@ -2,6 +2,8 @@ input*
 output*
 meta_values*
 filesXML
+*.zip
+*log*
 
 .venv
 venv
